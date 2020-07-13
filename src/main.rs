@@ -7,11 +7,14 @@ use std::result::Result;
 
 mod host;
 
+const NUM_THREADS: usize = 4;
+const SERVER_IP: &str = "127.0.0.1:7878";
+
 fn main() -> std::io::Result<()> {
     match host_or_client().unwrap() {
-        RunType::Host => host::start_hosting(4, "127.0.0.1:7878")?,
+        RunType::Host => host::start_hosting(NUM_THREADS, SERVER_IP)?,
         RunType::Client => {
-            let stream = TcpStream::connect("127.0.0.1:7878")?;
+            let stream = TcpStream::connect(SERVER_IP)?;
             if let Err(e) = send_file(stream, "C:\\Users\\jacks\\Desktop\\test.txt") {
                 panic!("The file was not able to be sent: {:?}", e);
             }
