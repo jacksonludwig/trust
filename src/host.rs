@@ -4,6 +4,7 @@ use threadpool::ThreadPool;
 
 use std::str;
 
+const HEADER_SIZE: usize = 100;
 const BUFFER_SIZE: usize = 4096;
 
 pub fn start_hosting(num_workers: usize, listener_ip: &str) -> std::io::Result<()> {
@@ -25,11 +26,18 @@ fn create_pool(num_workers: usize, listener_ip: &str) -> std::io::Result<()> {
 
 fn handle_connection(mut stream: TcpStream, address: SocketAddr) {
     println!("Received connection from: {}", address.to_string());
-    let mut buffer = vec![0; BUFFER_SIZE];
+    let mut buffer = vec![0; HEADER_SIZE + BUFFER_SIZE];
     let bytes_read = stream.read(&mut buffer).unwrap();
     println!("bytes read: {}", bytes_read);
+
     println!(
         "Buffer currently holds: {:?}",
         str::from_utf8(&buffer[0..bytes_read]).unwrap()
     );
+
+    let file_name = str::from_utf8(&buffer[0..HEADER_SIZE]).unwrap();
+    println!("File name: {}", file_name);
+
+    let file_contents = str::from_utf8(&buffer[HEADER_SIZE..bytes_read]).unwrap();
+    println!("File contains: {}", file_contents);
 }
