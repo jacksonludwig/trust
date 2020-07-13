@@ -16,7 +16,7 @@ pub fn start_sending(server_ip: &str) -> std::io::Result<()> {
 }
 
 fn find_file() -> std::io::Result<String> {
-    let file = match nfd2::open_file_dialog(None, None).expect("oh no") {
+    let file = match nfd2::open_file_dialog(None, None).unwrap() {
         Response::Okay(file_path) => file_path,
         _ => {
             return Err(std::io::Error::new(
