@@ -1,5 +1,5 @@
 [package]
-name = "rtransferclient"
+name = "trust"
 version = "0.1.0"
 authors = ["Jackson <jacksonludwig0@gmail.com>"]
 edition = "2018"
