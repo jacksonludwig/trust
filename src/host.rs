@@ -48,7 +48,7 @@ fn save_file(name: &str, contents: Vec<u8>) -> std::io::Result<()> {
     let path_name = name.trim_end_matches(char::from(0)).to_string();
     let path = [base_path, &path_name].join("");
 
-    let mut file = File::create(path)?;
+    let mut file = File::create(path.clone())?;
     file.write_all(&contents)?;
     println!("File saved to: {}", path);
 
