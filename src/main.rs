@@ -1,17 +1,12 @@
+use iced::{Sandbox, Settings};
+
 mod client;
+mod gui;
 mod handler;
 mod host;
 
-use handler::RunType;
-
-const NUM_THREADS: usize = 4;
-const SERVER_IP: &str = "192.168.1.217:7878";
-
 fn main() -> std::io::Result<()> {
-    match handler::host_or_client().unwrap() {
-        RunType::Host => host::start_hosting(NUM_THREADS, SERVER_IP)?,
-        RunType::Client => client::start_sending(SERVER_IP)?,
-    }
+    gui::App::run(Settings::default());
 
     Ok(())
 }
