@@ -19,9 +19,11 @@ struct Trust {
 #[derive(Debug, Clone)]
 enum Message {
     TextInputChanged(String),
+    HostButtonPressed,
+    ConnectButtonPressed,
 }
 
-pub enum Menu {
+enum Menu {
     Main,
     Host,
     Client,
@@ -49,6 +51,10 @@ impl Sandbox for Trust {
             Message::TextInputChanged(s) => {
                 self.ip_input_value = s;
             }
+            //TODO: Start hosting
+            Message::HostButtonPressed => {}
+            //TODO: Send a file
+            Message::ConnectButtonPressed => {}
         }
     }
 
