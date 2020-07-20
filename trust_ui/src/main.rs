@@ -1,13 +1,14 @@
 use iced::{
-    text_input, Column, Element, HorizontalAlignment, Length, Sandbox, Settings, Text, TextInput,
+    text_input, Column, Container, Element, HorizontalAlignment, Length, Sandbox, Settings, Text,
+    TextInput,
 };
 
 fn main() {
-    Container::run(Settings::default())
+    Trust::run(Settings::default())
 }
 
 #[derive(Default)]
-struct Container {
+struct Trust {
     ip_input: text_input::State,
     ip_input_value: String,
     menu: Menu,
@@ -30,7 +31,7 @@ impl Default for Menu {
     }
 }
 
-impl Sandbox for Container {
+impl Sandbox for Trust {
     type Message = Message;
 
     fn new() -> Self {
@@ -51,17 +52,31 @@ impl Sandbox for Container {
 
     fn view(&mut self) -> Element<'_, Self::Message> {
         match self.menu {
-            _ => Column::new()
-                .spacing(20)
-                .push(self.generate_main_title())
-                .push(self.generate_ip_input())
-                .into(),
+            _ => {
+                let main_column = Column::new()
+                    .max_width(800)
+                    .spacing(20)
+                    .push(self.generate_main_title())
+                    .push(self.generate_ip_input());
+                Container::new(main_column)
+                    .width(Length::Fill)
+                    .center_x()
+                    .into()
+            }
         }
     }
 }
 
 // These are helper functions for creating UI elements.
-impl Container {
+impl Trust {
+    fn generate_main_title(&self) -> Text {
+        Text::new("Trust")
+            .width(Length::Fill)
+            .size(100)
+            .color([0.5, 0.5, 0.5])
+            .horizontal_alignment(HorizontalAlignment::Center)
+    }
+
     fn generate_ip_input(&mut self) -> TextInput<Message> {
         TextInput::new(
             &mut self.ip_input,
@@ -69,13 +84,7 @@ impl Container {
             &self.ip_input_value,
             Message::TextInputChanged,
         )
-    }
-
-    fn generate_main_title(&self) -> Text {
-        Text::new("Trust")
-            .width(Length::Fill)
-            .size(100)
-            .color([0.5, 0.5, 0.5])
-            .horizontal_alignment(HorizontalAlignment::Center)
+        .padding(15)
+        .size(30)
     }
 }
