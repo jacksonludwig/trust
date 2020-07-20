@@ -1,4 +1,6 @@
-use iced::{text_input, Element, Row, Sandbox, Settings, Text, TextInput};
+use iced::{
+    text_input, Column, Element, HorizontalAlignment, Length, Sandbox, Settings, Text, TextInput,
+};
 
 fn main() {
     Container::run(Settings::default())
@@ -49,15 +51,30 @@ impl Sandbox for Container {
 
     fn view(&mut self) -> Element<'_, Self::Message> {
         match self.menu {
-            _ => Row::new()
-                .padding(40)
-                .push(TextInput::new(
-                    &mut self.ip_input,
-                    "IP Address",
-                    &mut self.ip_input_value,
-                    Message::TextInputChanged,
-                ))
+            _ => Column::new()
+                .spacing(20)
+                .push(self.generate_main_title())
+                .push(self.generate_ip_input())
                 .into(),
         }
+    }
+}
+
+impl Container {
+    fn generate_ip_input(&mut self) -> TextInput<Message> {
+        TextInput::new(
+            &mut self.ip_input,
+            "IP Address",
+            &self.ip_input_value,
+            Message::TextInputChanged,
+        )
+    }
+
+    fn generate_main_title(&self) -> Text {
+        Text::new("Trust")
+            .width(Length::Fill)
+            .size(100)
+            .color([0.5, 0.5, 0.5])
+            .horizontal_alignment(HorizontalAlignment::Center)
     }
 }
