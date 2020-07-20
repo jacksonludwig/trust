@@ -60,6 +60,7 @@ impl Sandbox for Container {
     }
 }
 
+// These are helper functions for creating UI elements.
 impl Container {
     fn generate_ip_input(&mut self) -> TextInput<Message> {
         TextInput::new(
