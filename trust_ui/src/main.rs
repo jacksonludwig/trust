@@ -54,51 +54,53 @@ impl Sandbox for Trust {
 
     fn view(&mut self) -> Element<'_, Self::Message> {
         match self.menu {
-            _ => Container::new(
-                Column::new()
+            _ => {
+                let title = Text::new("Trust")
+                    .width(Length::Fill)
+                    .size(100)
+                    .color([0.5, 0.5, 0.5])
+                    .horizontal_alignment(HorizontalAlignment::Center);
+
+                let input = TextInput::new(
+                    &mut self.ip_input,
+                    "IP Address",
+                    &self.ip_input_value,
+                    Message::TextInputChanged,
+                )
+                .padding(15)
+                .size(30);
+
+                let host_btn = Button::new(
+                    &mut self.host_button,
+                    Text::new("Host").horizontal_alignment(HorizontalAlignment::Center),
+                )
+                .width(Length::Units(100));
+
+                let connect_btn = Button::new(
+                    &mut self.connect_button,
+                    Text::new("Connect").horizontal_alignment(HorizontalAlignment::Center),
+                )
+                .width(Length::Units(100));
+
+                let button_row = Row::new().spacing(20).push(host_btn).push(connect_btn);
+                let buttons = Container::new(button_row)
+                    .width(Length::Fill)
+                    .center_x()
+                    .center_y();
+
+                let main_column = Column::new()
                     .max_width(800)
                     .spacing(20)
-                    .push(
-                        Text::new("Trust")
-                            .width(Length::Fill)
-                            .size(100)
-                            .color([0.5, 0.5, 0.5])
-                            .horizontal_alignment(HorizontalAlignment::Center),
-                    )
-                    .push(
-                        TextInput::new(
-                            &mut self.ip_input,
-                            "IP Address",
-                            &self.ip_input_value,
-                            Message::TextInputChanged,
-                        )
-                        .padding(15)
-                        .size(30),
-                    )
-                    .push(
-                        Container::new(
-                            Row::new()
-                                .spacing(20)
-                                .push(Button::new(
-                                    &mut self.host_button,
-                                    Text::new("Host")
-                                        .horizontal_alignment(HorizontalAlignment::Center),
-                                ))
-                                .push(Button::new(
-                                    &mut self.connect_button,
-                                    Text::new("Connect")
-                                        .horizontal_alignment(HorizontalAlignment::Center),
-                                )),
-                        )
-                        .width(Length::Fill)
-                        .center_x()
-                        .center_y(),
-                    ),
-            )
-            .width(Length::Fill)
-            .center_x()
-            .center_y()
-            .into(),
+                    .push(title)
+                    .push(input)
+                    .push(buttons);
+
+                Container::new(main_column)
+                    .width(Length::Fill)
+                    .center_x()
+                    .center_y()
+                    .into()
+            }
         }
     }
 }
