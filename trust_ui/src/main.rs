@@ -51,7 +51,7 @@ impl Sandbox for Trust {
             Message::TextInputChanged(s) => {
                 self.ip_input_value = s;
             }
-            //TODO: Start hosting
+            //TODO: Start hosting server
             Message::HostButtonPressed => {}
             //TODO: Send a file
             Message::ConnectButtonPressed => {}
