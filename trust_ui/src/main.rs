@@ -52,23 +52,24 @@ impl Sandbox for Trust {
 
     fn view(&mut self) -> Element<'_, Self::Message> {
         match self.menu {
-            _ => {
-                let main_column = Column::new()
-                    .max_width(800)
-                    .spacing(20)
-                    .push(self.generate_main_title())
-                    .push(self.generate_ip_input());
-                Container::new(main_column)
-                    .width(Length::Fill)
-                    .center_x()
-                    .into()
-            }
+            _ => Container::new(self.generate_main_column())
+                .width(Length::Fill)
+                .center_x()
+                .into(),
         }
     }
 }
 
 // These are helper functions for creating UI elements.
 impl Trust {
+    fn generate_main_column(&mut self) -> Column<Message> {
+        Column::new()
+            .max_width(800)
+            .spacing(20)
+            .push(self.generate_main_title())
+            .push(self.generate_ip_input())
+    }
+
     fn generate_main_title(&self) -> Text {
         Text::new("Trust")
             .width(Length::Fill)
