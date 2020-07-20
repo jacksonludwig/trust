@@ -1,6 +1,6 @@
 use iced::{
-    text_input, Column, Container, Element, HorizontalAlignment, Length, Sandbox, Settings, Text,
-    TextInput,
+    button, text_input, Button, Column, Container, Element, HorizontalAlignment, Length, Row,
+    Sandbox, Settings, Text, TextInput,
 };
 
 fn main() {
@@ -11,6 +11,8 @@ fn main() {
 struct Trust {
     ip_input: text_input::State,
     ip_input_value: String,
+    host_button: button::State,
+    connect_button: button::State,
     menu: Menu,
 }
 
@@ -68,6 +70,7 @@ impl Trust {
             .spacing(20)
             .push(self.generate_main_title())
             .push(self.generate_ip_input())
+            .push(self.generate_button_row())
     }
 
     fn generate_main_title(&self) -> Text {
@@ -87,5 +90,12 @@ impl Trust {
         )
         .padding(15)
         .size(30)
+    }
+
+    fn generate_button_row(&mut self) -> Row<Message> {
+        Row::new()
+            .padding(20)
+            .push(Button::new(&mut self.host_button, Text::new("HOST")))
+            .push(Button::new(&mut self.connect_button, Text::new("CONNECT")))
     }
 }
