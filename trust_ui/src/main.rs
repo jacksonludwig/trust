@@ -13,6 +13,8 @@ struct Trust {
     ip_input_value: String,
     host_button: button::State,
     connect_button: button::State,
+    status_value: String,
+
     menu: Menu,
 
     theme: style::Theme,
@@ -54,9 +56,13 @@ impl Sandbox for Trust {
                 self.ip_input_value = s;
             }
             //TODO: Start hosting server
-            Message::HostButtonPressed => {}
+            Message::HostButtonPressed => {
+                self.status_value = String::from("Hosting");
+            }
             //TODO: Send a file
-            Message::ConnectButtonPressed => {}
+            Message::ConnectButtonPressed => {
+                self.status_value = String::from("Connected");
+            }
         }
     }
 
@@ -83,6 +89,7 @@ impl Sandbox for Trust {
                     &mut self.host_button,
                     Text::new("Host").horizontal_alignment(HorizontalAlignment::Center),
                 )
+                .on_press(Message::HostButtonPressed)
                 .width(Length::Units(100))
                 .style(self.theme);
 
@@ -90,6 +97,7 @@ impl Sandbox for Trust {
                     &mut self.connect_button,
                     Text::new("Connect").horizontal_alignment(HorizontalAlignment::Center),
                 )
+                .on_press(Message::ConnectButtonPressed)
                 .width(Length::Units(100))
                 .style(self.theme);
 
@@ -99,12 +107,19 @@ impl Sandbox for Trust {
                     .center_x()
                     .center_y();
 
+                let status_text = Text::new(&self.status_value)
+                    .width(Length::Fill)
+                    .size(35)
+                    .color([0.5, 0.5, 0.5])
+                    .horizontal_alignment(HorizontalAlignment::Center);
+
                 let main_column = Column::new()
                     .max_width(800)
                     .spacing(20)
                     .push(title)
                     .push(input)
-                    .push(buttons);
+                    .push(buttons)
+                    .push(status_text);
 
                 Container::new(main_column)
                     .width(Length::Fill)
