@@ -14,6 +14,8 @@ struct Trust {
     host_button: button::State,
     connect_button: button::State,
     menu: Menu,
+
+    theme: style::Theme,
 }
 
 #[derive(Debug, Clone)]
@@ -74,19 +76,22 @@ impl Sandbox for Trust {
                     Message::TextInputChanged,
                 )
                 .padding(15)
-                .size(30);
+                .size(30)
+                .style(self.theme);
 
                 let host_btn = Button::new(
                     &mut self.host_button,
                     Text::new("Host").horizontal_alignment(HorizontalAlignment::Center),
                 )
-                .width(Length::Units(100));
+                .width(Length::Units(100))
+                .style(self.theme);
 
                 let connect_btn = Button::new(
                     &mut self.connect_button,
                     Text::new("Connect").horizontal_alignment(HorizontalAlignment::Center),
                 )
-                .width(Length::Units(100));
+                .width(Length::Units(100))
+                .style(self.theme);
 
                 let button_row = Row::new().spacing(20).push(host_btn).push(connect_btn);
                 let buttons = Container::new(button_row)
@@ -103,9 +108,164 @@ impl Sandbox for Trust {
 
                 Container::new(main_column)
                     .width(Length::Fill)
+                    .height(Length::Fill)
                     .center_x()
                     .center_y()
+                    .style(self.theme)
                     .into()
+            }
+        }
+    }
+}
+
+mod style {
+    use iced::{button, container, text_input};
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Theme {
+        Dark,
+    }
+
+    impl Theme {
+        pub const ALL: [Theme; 1] = [Theme::Dark];
+    }
+
+    impl Default for Theme {
+        fn default() -> Self {
+            Theme::Dark
+        }
+    }
+
+    impl From<Theme> for Box<dyn container::StyleSheet> {
+        fn from(theme: Theme) -> Self {
+            match theme {
+                Theme::Dark => dark::Container.into(),
+            }
+        }
+    }
+
+    impl From<Theme> for Box<dyn text_input::StyleSheet> {
+        fn from(theme: Theme) -> Self {
+            match theme {
+                Theme::Dark => dark::TextInput.into(),
+            }
+        }
+    }
+
+    impl From<Theme> for Box<dyn button::StyleSheet> {
+        fn from(theme: Theme) -> Self {
+            match theme {
+                Theme::Dark => dark::Button.into(),
+            }
+        }
+    }
+
+    mod dark {
+        use iced::{button, container, text_input, Background, Color};
+
+        const SURFACE: Color = Color::from_rgb(
+            0x40 as f32 / 255.0,
+            0x44 as f32 / 255.0,
+            0x4B as f32 / 255.0,
+        );
+
+        const ACCENT: Color = Color::from_rgb(
+            0x6F as f32 / 255.0,
+            0xFF as f32 / 255.0,
+            0xE9 as f32 / 255.0,
+        );
+
+        const ACTIVE: Color = Color::from_rgb(
+            0x72 as f32 / 255.0,
+            0x89 as f32 / 255.0,
+            0xDA as f32 / 255.0,
+        );
+
+        const HOVERED: Color = Color::from_rgb(
+            0x67 as f32 / 255.0,
+            0x7B as f32 / 255.0,
+            0xC4 as f32 / 255.0,
+        );
+
+        pub struct Container;
+
+        impl container::StyleSheet for Container {
+            fn style(&self) -> container::Style {
+                container::Style {
+                    background: Some(Background::Color(Color::from_rgb8(0x36, 0x39, 0x3F))),
+                    text_color: Some(Color::WHITE),
+                    ..container::Style::default()
+                }
+            }
+        }
+
+        pub struct TextInput;
+
+        impl text_input::StyleSheet for TextInput {
+            fn active(&self) -> text_input::Style {
+                text_input::Style {
+                    background: Background::Color(SURFACE),
+                    border_radius: 2,
+                    border_width: 0,
+                    border_color: Color::TRANSPARENT,
+                }
+            }
+
+            fn focused(&self) -> text_input::Style {
+                text_input::Style {
+                    border_width: 1,
+                    border_color: ACCENT,
+                    ..self.active()
+                }
+            }
+
+            fn hovered(&self) -> text_input::Style {
+                text_input::Style {
+                    border_width: 1,
+                    border_color: Color { a: 0.3, ..ACCENT },
+                    ..self.focused()
+                }
+            }
+
+            fn placeholder_color(&self) -> Color {
+                Color::from_rgb(0.4, 0.4, 0.4)
+            }
+
+            fn value_color(&self) -> Color {
+                Color::WHITE
+            }
+
+            fn selection_color(&self) -> Color {
+                ACTIVE
+            }
+        }
+
+        pub struct Button;
+
+        impl button::StyleSheet for Button {
+            fn active(&self) -> button::Style {
+                button::Style {
+                    background: Some(Background::Color(ACTIVE)),
+                    border_radius: 3,
+                    text_color: Color::WHITE,
+                    ..button::Style::default()
+                }
+            }
+
+            fn hovered(&self) -> button::Style {
+                button::Style {
+                    background: Some(Background::Color(HOVERED)),
+                    text_color: Color::WHITE,
+                    ..self.active()
+                }
+            }
+
+            fn pressed(&self) -> button::Style {
+                button::Style {
+                    border_width: 1,
+                    border_color: Color::WHITE,
+                    ..self.hovered()
+                }
             }
         }
     }
