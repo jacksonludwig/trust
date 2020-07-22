@@ -8,12 +8,12 @@ use std::net::TcpStream;
 
 const HEADER_SIZE: usize = 100;
 
-pub fn start_sending(server_ip: &str) -> std::io::Result<()> {
+pub fn start_sending(server_ip: &str) -> std::io::Result<(String, usize, usize)> {
     let stream = TcpStream::connect(server_ip)?;
     let file = find_file()?;
-    send_file(stream, &file)?;
+    let (name, size, written) = send_file(stream, &file)?;
 
-    Ok(())
+    Ok((name, size, written))
 }
 
 fn find_file() -> std::io::Result<String> {
@@ -29,7 +29,7 @@ fn find_file() -> std::io::Result<String> {
     Ok(file.to_str().unwrap().to_string())
 }
 
-fn send_file(mut stream: TcpStream, path: &str) -> io::Result<()> {
+fn send_file(mut stream: TcpStream, path: &str) -> io::Result<(String, usize, usize)> {
     let path = Path::new(path);
     let file_name = path.file_name().unwrap().to_str().unwrap();
     if file_name.len() > HEADER_SIZE {
@@ -41,7 +41,7 @@ fn send_file(mut stream: TcpStream, path: &str) -> io::Result<()> {
     println!("File name: {}", file_name);
 
     let mut file = File::open(path)?;
-    let file_size = file.metadata().unwrap().len();
+    let file_size = file.metadata().unwrap().len() as usize;
     println!("File size: {}", file_size);
 
     let mut buffer = read_name_into_buffer(file_name);
@@ -54,7 +54,7 @@ fn send_file(mut stream: TcpStream, path: &str) -> io::Result<()> {
 
     let written_amt = stream.write(&buffer)?;
     println!("Bytes written to stream: {}", written_amt);
-    Ok(())
+    Ok((file_name.to_string(), file_size, written_amt))
 }
 
 fn read_name_into_buffer(name: &str) -> Vec<u8> {

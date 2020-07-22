@@ -5,4 +5,6 @@ mod gui;
 mod handler;
 mod host;
 
-fn main() {}
+fn main() {
+    gui::start();
+}
