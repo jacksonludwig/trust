@@ -1,9 +1,12 @@
+use std::sync::{Arc, Mutex};
+use std::thread;
+
 use iced::{
     button, text_input, Button, Column, Container, Element, HorizontalAlignment, Length, Row,
     Sandbox, Settings, Text, TextInput,
 };
 
-use super::{host, client};
+use super::{client, host};
 
 const NUM_WORKERS: usize = 6;
 
@@ -49,82 +52,88 @@ impl Sandbox for Trust {
             //TODO: Multithread
             //TODO: Change base path
             Message::HostButtonPressed => {
-                match host::start_hosting(NUM_WORKERS, &self.ip_input_value) {
-                    Err(e) => println!("placeholder error: {}", e),
-                    Ok(()) => println!("placeholder data"),
-                }
-                self.status_value = String::from("Hosting");
+                thread::spawn(move || {
+                    match host::start_hosting(NUM_WORKERS, "172.25.112.1:7878") {
+                        Err(e) => println!("placeholder error: {}", e),
+                        Ok(()) => println!("placeholder data"),
+                    }
+                    // self.status_value = String::from("Hosting");
+                });
             }
             Message::ConnectButtonPressed => {
-                match client::start_sending(&self.ip_input_value) {
-                    Err(e) => println!("placeholder error: {}", e),
-                    Ok((name, size, written)) => println!("placeholder data: {}, {}, {}", name, size, written)
-                }
-                self.status_value = String::from("Connected");
+                thread::spawn(move || {
+                    match client::start_sending("172.25.112.1:7878") {
+                        Err(e) => println!("placeholder error: {}", e),
+                        Ok((name, size, written)) => {
+                            println!("placeholder data: {}, {}, {}", name, size, written)
+                        }
+                    }
+                    // self.status_value = String::from("Connected");
+                });
             }
         }
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {
-            let title = Text::new("Trust")
-                .width(Length::Fill)
-                .size(100)
-                .color([0.5, 0.5, 0.5])
-                .horizontal_alignment(HorizontalAlignment::Center);
+        let title = Text::new("Trust")
+            .width(Length::Fill)
+            .size(100)
+            .color([0.5, 0.5, 0.5])
+            .horizontal_alignment(HorizontalAlignment::Center);
 
-            let input = TextInput::new(
-                &mut self.ip_input,
-                "IP Address",
-                &self.ip_input_value,
-                Message::TextInputChanged,
-            )
-            .padding(15)
-            .size(30)
-            .style(self.theme);
+        let input = TextInput::new(
+            &mut self.ip_input,
+            "IP Address",
+            &self.ip_input_value,
+            Message::TextInputChanged,
+        )
+        .padding(15)
+        .size(30)
+        .style(self.theme);
 
-            let host_btn = Button::new(
-                &mut self.host_button,
-                Text::new("Host").horizontal_alignment(HorizontalAlignment::Center),
-            )
-            .on_press(Message::HostButtonPressed)
-            .width(Length::Units(100))
-            .style(self.theme);
+        let host_btn = Button::new(
+            &mut self.host_button,
+            Text::new("Host").horizontal_alignment(HorizontalAlignment::Center),
+        )
+        .on_press(Message::HostButtonPressed)
+        .width(Length::Units(100))
+        .style(self.theme);
 
-            let connect_btn = Button::new(
-                &mut self.connect_button,
-                Text::new("Connect").horizontal_alignment(HorizontalAlignment::Center),
-            )
-            .on_press(Message::ConnectButtonPressed)
-            .width(Length::Units(100))
-            .style(self.theme);
+        let connect_btn = Button::new(
+            &mut self.connect_button,
+            Text::new("Connect").horizontal_alignment(HorizontalAlignment::Center),
+        )
+        .on_press(Message::ConnectButtonPressed)
+        .width(Length::Units(100))
+        .style(self.theme);
 
-            let button_row = Row::new().spacing(20).push(host_btn).push(connect_btn);
-            let buttons = Container::new(button_row)
-                .width(Length::Fill)
-                .center_x()
-                .center_y();
+        let button_row = Row::new().spacing(20).push(host_btn).push(connect_btn);
+        let buttons = Container::new(button_row)
+            .width(Length::Fill)
+            .center_x()
+            .center_y();
 
-            let status_text = Text::new(&self.status_value)
-                .width(Length::Fill)
-                .size(35)
-                .color([0.5, 0.5, 0.5])
-                .horizontal_alignment(HorizontalAlignment::Center);
+        let status_text = Text::new(&self.status_value)
+            .width(Length::Fill)
+            .size(35)
+            .color([0.5, 0.5, 0.5])
+            .horizontal_alignment(HorizontalAlignment::Center);
 
-            let main_column = Column::new()
-                .max_width(800)
-                .spacing(20)
-                .push(title)
-                .push(input)
-                .push(buttons)
-                .push(status_text);
+        let main_column = Column::new()
+            .max_width(800)
+            .spacing(20)
+            .push(title)
+            .push(input)
+            .push(buttons)
+            .push(status_text);
 
-            Container::new(main_column)
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .center_x()
-                .center_y()
-                .style(self.theme)
-                .into()
+        Container::new(main_column)
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .center_x()
+            .center_y()
+            .style(self.theme)
+            .into()
     }
 }
 
